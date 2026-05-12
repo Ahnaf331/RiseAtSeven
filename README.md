@@ -1,6 +1,6 @@
 # Rise at Seven — Clone
 
-A pixel-perfect clone of [riseatseven.com](https://www.riseatseven.com) built with React, Tailwind CSS & Framer Motion.
+A clone of [riseatseven.com](https://www.riseatseven.com) built with React, Tailwind CSS & Framer Motion.
 
 **Live Demo:** [rise-at-seven-clone-neon.vercel.app](https://rise-at-seven-clone-neon.vercel.app/)
 
