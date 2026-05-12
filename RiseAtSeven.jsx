@@ -321,6 +321,24 @@ const Btn = ({ children, dark = false, outline = false, icon = true, small = fal
   </button>
 );
 
+// Reusable wipe-up button — slot-machine text reveal on hover
+const WipeButton = ({ label, href = '#', variant = 'ghost', className = '', arrow = true }) => (
+  <a href={href} className={`wipe-btn wipe-btn--${variant} ${className}`}>
+    <span className="wipe-btn__clip">
+      <span className="wipe-btn__inner">
+        <span className="wipe-btn__text">
+          {label}
+          {arrow && <ArrowUpRight size={13} strokeWidth={2} />}
+        </span>
+        <span className="wipe-btn__text" aria-hidden="true">
+          {label}
+          {arrow && <ArrowUpRight size={13} strokeWidth={2} />}
+        </span>
+      </span>
+    </span>
+  </a>
+);
+
 const SocialIcon = ({ type }) => {
   const paths = {
     instagram: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z',
@@ -604,7 +622,7 @@ const Hamburger = ({ open, onClick, dark = true }) => (
   </button>
 );
 
-// ─── HEADER ───────────────────────────────────────────────────────────────────
+const ANNOUNCEMENT_BAR_HEIGHT = 40; // px height of the top announcement bar
 
 const Header = ({ isMenuOpen, setIsMenuOpen }) => {
   const [scrollY, setScrollY] = useState(0);
@@ -624,39 +642,29 @@ const Header = ({ isMenuOpen, setIsMenuOpen }) => {
   }, []);
 
   const scrolled  = scrollY > 80;
-  const promoHide = scrollY > 20;
   // On dark hero (transparent header) → white text; on scrolled (light bg) → dark text
   const light = !scrolled;
+  // When at top, offset header below the announcement bar; when scrolled, sit at top:0
+  const headerTop = scrolled ? 0 : Math.max(0, ANNOUNCEMENT_BAR_HEIGHT - scrollY);
 
   return (
     <header className={[
-      'fixed top-0 left-0 w-full z-[100] transition-all duration-500',
+      'fixed left-0 w-full z-[100] transition-all duration-500',
       scrolled ? 'bg-g-100 shadow-[0_1px_0_0_rgba(17,18,18,0.08)]' : 'bg-transparent',
       hidden   ? '-translate-y-full' : 'translate-y-0',
-    ].join(' ')}>
-      {/* Promo bar */}
-      <div className={`pt-2.5 px-2.5 w-full transition-all duration-300 ${
-        promoHide ? 'opacity-0 pointer-events-none h-0 overflow-hidden !pt-0' : 'opacity-100'
-      }`}>
-        <a
-          href="#"
-          className="group flex justify-center items-center text-xs w-full py-2.5 px-5 text-center tracking-tight leading-none font-semibold rounded-2xl transition-all duration-300 hover:rounded-md text-g-900 bg-mint"
-        >
-          🚨 The Category Leaderboard — Live Now
-        </a>
-      </div>
-
+    ].join(' ')}
+      style={{ top: headerTop }}
+    >
       <div className="flex items-center justify-between px-4 md:px-5 lg:px-8 xl:px-12 py-3.5 max-w-screen-2xl mx-auto">
         <a href="#" className="flex-shrink-0"><Logo white={light} /></a>
         <DesktopNav light={light} />
         <div className="flex items-center gap-3">
-          <button className={[
-            'hidden sm:inline-flex items-center gap-2 text-[13px] font-semibold tracking-tightish leading-none',
-            'px-5 py-3 rounded-full transition-all duration-300 hover:rounded-xl cursor-pointer',
-            scrolled ? 'bg-g-900 text-white' : 'bg-white text-g-900',
-          ].join(' ')}>
-            Get In Touch <span className="text-[11px]">»</span>
-          </button>
+          <WipeButton
+            label="Get In Touch"
+            href="/connect-with-us"
+            variant={scrolled ? 'header-light' : 'header-dark'}
+            className="hidden sm:inline-flex"
+          />
           <div className="lg:hidden">
             <Hamburger open={isMenuOpen} onClick={() => setIsMenuOpen(v => !v)} dark={scrolled} />
           </div>
@@ -776,27 +784,21 @@ const MobileMenu = ({ isOpen, onClose }) => {
 
 // ─── SECTIONS ────────────────────────────────────────────────────────────────
 
-// Award medallion SVG for the hero (white, minimal)
-const AwardMedallion = ({ lines }) => (
-  <div className="flex flex-col items-center gap-0.5 opacity-70 hover:opacity-100 transition-opacity">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-white md:w-8 md:h-8">
-      <circle cx="14" cy="14" r="12.5" stroke="currentColor" strokeWidth="1" />
-      <circle cx="14" cy="14" r="9" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
-      <path d="M14 4 L15 9 L14 11 L13 9 Z" fill="currentColor" opacity="0.6" />
-    </svg>
-    {lines.map((l, i) => (
-      <span key={i} className="text-white text-[6px] md:text-[7px] font-semibold text-center tracking-wider uppercase leading-none">{l}</span>
-    ))}
-  </div>
-);
+// Award logo images for the hero (actual brand logos from /awards/)
+const heroAwardLogos = [
+  { name: 'Global Search Awards',   src: '/awards/global-search-awards.png' },
+  { name: 'European Search Awards', src: '/awards/Mask-group.png' },
+  { name: 'UK Social Media Awards', src: '/awards/UKSocial-Media-Awards-White.png' },
+  { name: 'UK Content Awards',      src: '/awards/UK-Content-Awards-White.png' },
+];
 
 const Hero = () => {
   const [bgIdx] = useState(() => Math.floor(Math.random() * heroImages.length));
 
   return (
-    <section className="relative bg-g-900 overflow-hidden flex flex-col" style={{ minHeight: '100svh' }}>
+    <section className="hero-card">
       {/* Background image — random on each page load */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 rounded-[inherit] overflow-hidden">
         <img
           src={heroImages[bgIdx]}
           alt=""
@@ -814,18 +816,23 @@ const Hero = () => {
           <p className="text-[8px] md:text-[9px] uppercase tracking-[0.15em] text-white/45 font-semibold mb-4 md:mb-5">
             #1 Most Recommended Content Marketing Agency
           </p>
-          <div className="flex items-end justify-center gap-5 md:gap-8">
-            <AwardMedallion lines={['Global', 'Search', 'Awards']} />
-            <AwardMedallion lines={['The Drum']} />
-            <AwardMedallion lines={['UK Social', 'Media Awards']} />
-            <AwardMedallion lines={['Content', 'Awards']} />
+          <div className="flex items-center justify-center gap-4 md:gap-6">
+            {heroAwardLogos.map(logo => (
+              <img
+                key={logo.name}
+                src={logo.src}
+                alt={logo.name}
+                className="h-7 md:h-9 lg:h-10 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                loading="eager"
+              />
+            ))}
           </div>
         </div>
 
         {/* Giant heading */}
         <h1
           className="font-medium text-white text-center leading-[0.88] tracking-tight"
-          style={{ fontSize: 'clamp(3.5rem, 10.5vw, 13rem)' }}
+          style={{ fontSize: 'clamp(3rem, 8.5vw, 10rem)' }}
         >
           We Create<br />
           <span className="inline-flex items-center gap-[0.12em]">
@@ -966,31 +973,19 @@ const DrivingDemand = () => (
             </span>
           </h2>
 
-          <div className="flex items-center gap-5 flex-wrap">
-            {/* Our Story — solid white pill */}
-            <a
-              href="#"
-              className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm lg:text-base font-medium text-g-900 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-            >
-              <span>Our Story</span>
-              <ArrowUpRight
-                size={16}
-                strokeWidth={2}
-                className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </a>
-            {/* Our Services — plain text link */}
-            <a
-              href="#"
-              className="group inline-flex items-center gap-1.5 text-sm lg:text-base font-medium text-g-900 hover:text-g-900/60 transition-colors"
-            >
-              <span>Our Services</span>
-              <ArrowUpRight
-                size={16}
-                strokeWidth={2}
-                className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </a>
+          <div className="flex items-center gap-4 flex-wrap">
+            {/* Our Story — solid white fill pill with wipe animation */}
+            <WipeButton
+              label="Our Story"
+              href="/about"
+              variant="filled"
+            />
+            {/* Our Services — ghost/outline pill with wipe animation */}
+            <WipeButton
+              label="Our Services"
+              href="/services"
+              variant="ghost"
+            />
           </div>
         </div>
       </div>
@@ -1794,6 +1789,12 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="bg-g-100 font-sans antialiased">
+      {/* Announcement bar — static at very top, separate from the card */}
+      <div className="announcement-bar-static">
+        <a href="#" className="announcement-bar-link">
+          🚨 The Category Leaderboard – Live Now
+        </a>
+      </div>
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
       <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <main>

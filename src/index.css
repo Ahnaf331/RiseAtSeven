@@ -14,6 +14,154 @@
   100% { transform: translateX(-50%); }
 }
 
+/* ── Announcement bar — card style (matches real site) ── */
+.announcement-bar-static {
+  background: #B8F0E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 101;
+  margin: 10px 10px 0 10px;
+  border-radius: 16px;
+}
+
+.announcement-bar-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+  text-align: center;
+  letter-spacing: -0.01em;
+  transition: all 0.3s ease;
+  border-radius: inherit;
+}
+
+.announcement-bar-link:hover {
+  opacity: 0.75;
+  border-radius: 8px;
+}
+
+/* ── Hero card — rounded card layout matching real riseatseven.com ── */
+.hero-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: #111212;
+  overflow: hidden;
+  margin: 8px 8px 0 8px;
+  border-radius: 24px;
+}
+
+@media (min-width: 768px) {
+  .hero-card {
+    margin: 10px 10px 0 10px;
+    border-radius: 28px;
+  }
+}
+
+/* ── Wipe Button (reusable vertical slot-machine text reveal) ── */
+.wipe-btn {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.wipe-btn__clip {
+  overflow: hidden;
+  height: 17px;        /* 14px font × 1.2 line-height = 16.8px, rounded up */
+  display: block;
+}
+
+.wipe-btn__inner {
+  display: flex;
+  flex-direction: column;
+  transition: transform 380ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.wipe-btn__text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  height: 1.2em;
+}
+
+.wipe-btn:hover .wipe-btn__inner,
+.wipe-btn:focus-visible .wipe-btn__inner {
+  transform: translateY(-50%);
+}
+
+/* Variants */
+.wipe-btn--filled {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+
+.wipe-btn--filled-dark {
+  background: #111212;
+  color: #fff;
+  border: 1px solid #111212;
+}
+
+.wipe-btn--filled-dark-on-scroll {
+  color: #111;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+.wipe-btn--ghost {
+  background: transparent;
+  color: #111;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* Header variant: white bg + dark text when scrolled, dark bg + white text when on hero */
+.wipe-btn--header-light {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.wipe-btn--header-dark {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.wipe-btn--header-dark .wipe-btn__text {
+  color: #fff;
+}
+
+.wipe-btn--header-light .wipe-btn__text {
+  color: #111;
+}
+
 /* scrollbar hide for horizontal scroll containers */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .wipe-btn__inner {
+    transition: none !important;
+  }
+  .wipe-btn:hover .wipe-btn__inner,
+  .wipe-btn:focus-visible .wipe-btn__inner {
+    transform: none !important;
+  }
+}
